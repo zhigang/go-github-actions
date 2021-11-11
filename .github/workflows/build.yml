@@ -18,7 +18,7 @@ jobs:
           go-version: 1.17
 
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Lint Go Code
         run: |
@@ -34,7 +34,7 @@ jobs:
         with:
           go-version: 1.17
       - name: Check out code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Run Unit tests.
         run: make test-coverage
       - name: Upload Coverage report to CodeCov
@@ -42,16 +42,23 @@ jobs:
         with:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage.all
-  build:
-    name: Build
-    runs-on: ubuntu-latest 
+  release:
+    name: Release on GitHub
+    runs-on: ubuntu-latest
     needs: [lint, test]
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.17
-      - name: Check out code
-        uses: actions/checkout@v1
-      - name: Build
-        run: make build
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
+    - name: Validates GO releaser config
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        version: latest
+        args: check
+    - name: Create release on GitHub
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        args: release
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
