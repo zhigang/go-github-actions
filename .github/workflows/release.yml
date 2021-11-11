@@ -1,0 +1,27 @@
+name: Build and Test
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    name: Release on GitHub
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+          fetch-depth: 0
+    - name: Validates GO releaser config
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        version: latest
+        args: check
+    - name: Create release on GitHub
+      uses: goreleaser/goreleaser-action@v2
+      with:
+        args: release
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
