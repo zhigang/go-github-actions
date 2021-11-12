@@ -3,12 +3,12 @@
 BINARY="go-github-actions"
 PKG_LIST := $(shell go list ./...)
 
-all: check test build
+all: dep check test build
 
 dep:
 	@go mod download
 
-build: dep
+build: 
 	@go build -o ${BINARY}
 
 clean:
